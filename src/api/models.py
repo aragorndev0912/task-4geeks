@@ -3,9 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
+    password = db.Column(db.String(250), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
 
     def __repr__(self):
@@ -16,4 +17,23 @@ class User(db.Model):
             "id": self.id,
             "email": self.email,
             # do not serialize the password, its a security breach
+        }
+class Task(db.Model):
+    __tablename__ = 'task'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(250), nullable=False)
+    url = db.Column(db.String(250), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User')
+
+    def __repr__(self):
+        return f'<Task {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "user": self.user.serialize(),
+            "url": self.url,
         }
