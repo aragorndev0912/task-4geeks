@@ -91,6 +91,10 @@ def serve_any_other_file(path):
 #------------------------------------------------------
 CODE_FORMAT = 'UTF-8'
 
+@app.route("/hello-heroku", methods=["GET"])
+def hello_heroku():
+    return jsonify("hello heroku"), 200
+
 @app.route('/signup', methods=['POST'])
 def signup():
     body = request.get_json()
