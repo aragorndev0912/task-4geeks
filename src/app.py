@@ -13,6 +13,7 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 
 from flask_jwt_extended import JWTManager
+
 #from models import Person
 
 ENV = os.getenv("FLASK_ENV")
@@ -24,6 +25,13 @@ app.url_map.strict_slashes = False
 app.config["JWT_SECRET_KEY"] = "super-secret"
 jwt = JWTManager(app)
 
+app.config['MAIL_SERVER']='smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USERNAME'] = '5ca910d21c3773'
+app.config['MAIL_PASSWORD'] = '019d56dc8cc902'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+# mail = Mail(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")

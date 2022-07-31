@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from api.models import db, User, Task
 from api.utils import generate_sitemap, APIException
 
@@ -9,13 +9,15 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import get_jwt_identity
 
-
 import bcrypt
 
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+from flask_mail import Mail, Message
+
+import datetime
 
 api = Blueprint('api', __name__)
 
@@ -71,7 +73,8 @@ def login():
     if not bcrypt.checkpw(bytes(password, CODE_FORMAT), bytes(user.password, CODE_FORMAT)):
         raise APIException("Password is incorrect", status_code=404)
 
-    token = create_access_token(identity=user.id)
+    expires = datetime.timedelta(days=365)
+    token = create_access_token(identity=user.id, expires_delta=expires)
     return jsonify(token)
 
 @api.route('/task', methods=['POST'])
@@ -86,4 +89,13 @@ def create_task():
 
     db.session.add(task)
     db.session.commit()
+    
+    
+    mail = Mail(current_app)
+    msg = Message("Hello",
+                  sender="from@example.com",
+                  recipients=["to@example.com"])
+    msg.html = "<b>testing</b>"
+    mail.send(msg)
+
     return jsonify(task.serialize()), 201
